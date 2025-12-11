@@ -1,3 +1,4 @@
+biopython==1.86
 joblib==1.5.2
 mmh3==5.2.0
 numpy==2.3.5
