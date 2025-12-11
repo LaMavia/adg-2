@@ -1,3 +1,4 @@
+import math
 import sys
 from typing import Iterator
 import pandas as pd
@@ -19,6 +20,10 @@ def test_sets(path: str) -> Iterator[Iterator[str]]:
 
         with open_fun(dpath, 'rt') as handle:
             yield (str(record['seq']) for record in SeqIO.parse(handle, "fasta"))
+
+def optimal_k(n: int) -> int:
+    q = 0.01
+    return math.ceil(math.log(n * (1 - q) / q, 4))
 
 def main():
     # python3 classifier.py training_data.tsv testing_data.tsv output.tsv
