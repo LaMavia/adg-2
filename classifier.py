@@ -53,6 +53,10 @@ def compute_minhash(kmers: Iterator[str], m: int = 256) -> np.ndarray:
                 sketch[i] = h
     return sketch
 
+def optimal_k(n: int) -> int:
+    q = 0.01
+    return math.ceil(math.log(n * (1 - q) / q, 4))
+
 def main():
     # python3 classifier.py training_data.tsv testing_data.tsv output.tsv
     _, training_path, testing_path, output_path = sys.argv
