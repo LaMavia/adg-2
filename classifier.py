@@ -11,7 +11,7 @@ def training_sets(path: str) -> Iterator[tuple[str, Iterator[str]]]:
         open_fun = gzip.open if dpath.endswith('.gz') else open
 
         with open_fun(dpath, 'rt') as handle:
-            yield dcls, (str(record['seq']) for record in SeqIO.parse(handle, "fasta"))
+            yield dcls, (str(record.seq) for record in SeqIO.parse(handle, "fasta"))
 
 def test_sets(path: str) -> Iterator[Iterator[str]]:
     datasets = pd.read_csv(path, delimiter="\t")
@@ -19,7 +19,7 @@ def test_sets(path: str) -> Iterator[Iterator[str]]:
         open_fun = gzip.open if dpath.endswith('.gz') else open
 
         with open_fun(dpath, 'rt') as handle:
-            yield (str(record['seq']) for record in SeqIO.parse(handle, "fasta"))
+            yield (str(record.seq) for record in SeqIO.parse(handle, "fasta"))
 
 def optimal_k(n: int) -> int:
     q = 0.01
@@ -29,7 +29,8 @@ def main():
     # python3 classifier.py training_data.tsv testing_data.tsv output.tsv
     _, training_path, testinng_path, output_path = sys.argv
 
-    training_sets(training_path)
+    for c, ds in training_sets(training_path):
+        print(list(ds), sep="\n\n")
 
 if __name__ == "__main__":
     main()
