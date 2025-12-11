@@ -8,8 +8,13 @@
     in
     {
       devShell = pkgs.mkShell {
-        buildInputs = (with pkgs; [
-          python312Packages.python
+        buildInputs = (with pkgs.python312Packages; [
+          python
+          numpy
+          biopython
+          mmh3
+          pandas
+          scikit-learn
         ]);
       };
     }

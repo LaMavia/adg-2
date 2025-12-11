@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+cd $(dirname $0)
+
+OUTPUT=./_output.tsv
+GROUND_TRUTH=$1
+
+shift
+
+command time -v python ./classifier.py $@ "$OUTPUT"
+
+python3 ./evaluate.py "$OUTPUT" "$GROUND_TRUTH"
