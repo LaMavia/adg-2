@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# ./test.sh ground_truth training test 
+
 cd $(dirname $0)
 
 OUTPUT=./_output.tsv
