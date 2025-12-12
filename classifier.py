@@ -33,7 +33,7 @@ def running_set[T](max_size: int, iter: Iterator[T]) -> Iterator[T]:
         yield from set(elems)
 
 def training_sets(path: str) -> Iterator[tuple[str, Iterator[str]]]:
-    root = os.path.dirname(path)
+    root = os.path.dirname(os.path.realpath(path))
     datasets = pd.read_csv(path, delimiter=CSV_DELIMITER)
     class_paths = defaultdict(list)
     for _, (set_path, class_label, *_) in datasets.iterrows():
@@ -43,7 +43,7 @@ def training_sets(path: str) -> Iterator[tuple[str, Iterator[str]]]:
         yield class_label, itertools.chain(*map(make_seq_gen, data_paths))
 
 def test_sets(path: str) -> Iterator[tuple[str, Iterator[str]]]:
-    root = os.path.dirname(path)
+    root = os.path.dirname(os.path.realpath(path))
     datasets = pd.read_csv(path, delimiter=CSV_DELIMITER)
     for _, (set_path, *_) in datasets.iterrows():
         open_fun = gzip.open if set_path.endswith('.gz') else open
