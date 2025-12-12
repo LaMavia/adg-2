@@ -134,7 +134,8 @@ def compute_minhash(kmers: Iterator[str], m: int) -> Sketch:
     #     BloomFilter(FILTER_LEN, FILTER_HASHES)
     #     for _ in range(N_FILTERS)
     # ]
-    C = 4
+    W = 2_000_000
+    C = optimal_k(W)
     sketch = array('L', [MAX_U32] * m)
 
     for kmer, cnt in batch_counter(kmers, 100_000):
