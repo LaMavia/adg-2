@@ -9,6 +9,7 @@ import mmh3
 from tqdm import tqdm
 from array import array
 import itertools
+import os
 
 MAX_U32 = 2**32 - 1
 CSV_DELIMITER = "\t"
@@ -32,21 +33,23 @@ def running_set[T](max_size: int, iter: Iterator[T]) -> Iterator[T]:
         yield from set(elems)
 
 def training_sets(path: str) -> Iterator[tuple[str, Iterator[str]]]:
+    root = os.path.dirname(path)
     datasets = pd.read_csv(path, delimiter=CSV_DELIMITER)
     class_paths = defaultdict(list)
     for _, (set_path, class_label, *_) in datasets.iterrows():
-        class_paths[class_label].append(set_path)
+        class_paths[class_label].append(f'{root}/{set_path}')
 
     for class_label, data_paths in class_paths.items():
         yield class_label, itertools.chain(*map(make_seq_gen, data_paths))
 
 def test_sets(path: str) -> Iterator[tuple[str, Iterator[str]]]:
+    root = os.path.dirname(path)
     datasets = pd.read_csv(path, delimiter=CSV_DELIMITER)
-    for _, (dpath, *_) in datasets.iterrows():
-        open_fun = gzip.open if dpath.endswith('.gz') else open
+    for _, (set_path, *_) in datasets.iterrows():
+        open_fun = gzip.open if set_path.endswith('.gz') else open
 
-        with open_fun(dpath, 'rt') as handle:
-            yield dpath, (str(record.seq) for record in SeqIO.parse(handle, "fasta"))
+        with open_fun(f'{root}/{set_path}', 'rt') as handle:
+            yield set_path, (str(record.seq) for record in SeqIO.parse(handle, "fasta"))
 
 def canonical_kmer(kmer: str) -> str:
     complement = str.maketrans("ACGT", "TGCA")
