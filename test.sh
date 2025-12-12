@@ -9,6 +9,5 @@ GROUND_TRUTH=$1
 
 shift
 
-command time -f '%C, %M KB, %U s' python ./classifier.py $@ "$OUTPUT"
-
-python3 ./evaluate.py "$OUTPUT" "$GROUND_TRUTH"
+command time -f 'command: %C\nmemory: %M KB\ntime: %U s' python ./classifier.py $@ "$OUTPUT" \
+  && python3 ./evaluate.py "$OUTPUT" "$GROUND_TRUTH"

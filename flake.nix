@@ -15,6 +15,7 @@
           mmh3
           pandas
           scikit-learn
+          tqdm
         ]);
       };
     }
