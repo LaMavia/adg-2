@@ -61,6 +61,9 @@ def kmer_generator(sequences: Iterator[str], k: int) -> Iterator[str]:
         n = len(seq)
         for i in range(n - k + 1):
             kmer = seq[i:i+k]
+            if 'N' in kmer:
+                continue
+
             yield canonical_kmer(kmer)
 
 def minhash_similarity(sketch_size: int, a: Sketch, b: Sketch) -> float:
