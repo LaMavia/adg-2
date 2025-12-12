@@ -1,4 +1,4 @@
-from collections import defaultdict, deque
+from collections import Counter, defaultdict, deque
 import math
 import sys
 from typing import Iterator
@@ -75,8 +75,12 @@ def compute_minhash(kmers: Iterator[str], m: int) -> Sketch:
     Compute a MinHash sketch of size m from an iterator of k-mers.
     Sketch[i] = minimum hash observed under seed i
     """
+    C = 4
     sketch = array('L', [MAX_U32] * m)
-    for kmer in kmers:
+    candidate_set = Counter(kmers)
+    for kmer, cnt in candidate_set.items():
+        if cnt < C:
+            continue
         for i in range(m):
             h = mmh3.hash(kmer, seed=i, signed=False)
             if h < sketch[i]:
