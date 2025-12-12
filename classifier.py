@@ -8,6 +8,7 @@ import gzip
 import mmh3
 from tqdm import tqdm
 from array import array
+import itertools
 
 MAX_U32 = 2**32 - 1
 CSV_DELIMITER = "\t"
@@ -20,13 +21,24 @@ def csv_length(path: str) -> int:
     with open(path) as f:
         return deque(enumerate(f), 1).pop()[0]
 
+def make_seq_gen(path: str) -> Iterator[str]:
+    open_fun = gzip.open if path.endswith('.gz') else open
+
+    with open_fun(path, 'rt') as handle:
+        yield from (str(record.seq) for record in SeqIO.parse(handle, "fasta"))
+
+def running_set[T](max_size: int, iter: Iterator[T]) -> Iterator[T]:
+    for elems in itertools.batched(iter, max_size):
+        yield from set(elems)
+
 def training_sets(path: str) -> Iterator[tuple[str, Iterator[str]]]:
     datasets = pd.read_csv(path, delimiter=CSV_DELIMITER)
-    for _, (dpath, dcls, *_) in datasets.iterrows():
-        open_fun = gzip.open if dpath.endswith('.gz') else open
+    class_paths = defaultdict(list)
+    for _, (set_path, class_label, *_) in datasets.iterrows():
+        class_paths[class_label].append(set_path)
 
-        with open_fun(dpath, 'rt') as handle:
-            yield dcls, (str(record.seq).upper() for record in SeqIO.parse(handle, "fasta"))
+    for class_label, data_paths in class_paths.items():
+        yield class_label, itertools.chain(*map(make_seq_gen, data_paths))
 
 def test_sets(path: str) -> Iterator[tuple[str, Iterator[str]]]:
     datasets = pd.read_csv(path, delimiter=CSV_DELIMITER)
@@ -34,7 +46,7 @@ def test_sets(path: str) -> Iterator[tuple[str, Iterator[str]]]:
         open_fun = gzip.open if dpath.endswith('.gz') else open
 
         with open_fun(dpath, 'rt') as handle:
-            yield dpath, (str(record.seq).upper() for record in SeqIO.parse(handle, "fasta"))
+            yield dpath, (str(record.seq) for record in SeqIO.parse(handle, "fasta"))
 
 def canonical_kmer(kmer: str) -> str:
     complement = str.maketrans("ACGT", "TGCA")
@@ -49,15 +61,12 @@ def kmer_generator(sequences: Iterator[str], k: int) -> Iterator[str]:
             yield canonical_kmer(kmer)
 
 def minhash_similarity(sketch_size: int, a: Sketch, b: Sketch) -> float:
-    return sum(1 for i in range(sketch_size) if a[i] == b[i]) / sketch_size
+    return sum(a[i] == b[i] for i in range(sketch_size)) / sketch_size
 
-def classify_sketch(sketch_size: int, classes: dict[str, Class], sketch: Sketch) -> dict[str, float]:
+def classify_sketch(sketch_size: int, classes: dict[str, Sketch], sketch: Sketch) -> dict[str, float]:
     classification = {}
-    for class_name, class_sketches in classes.items():
-        sims = (minhash_similarity(sketch_size, class_sketch, sketch) for class_sketch in class_sketches)
-        avg_sim = max(sims) / len(class_sketches)
-
-        classification[class_name] = avg_sim
+    for class_name, class_sketch in classes.items():
+        classification[class_name] = minhash_similarity(sketch_size, class_sketch, sketch)
             
     return classification
 
@@ -83,17 +92,17 @@ def main():
     # python3 classifier.py training_data.tsv testing_data.tsv output.tsv
     _, training_path, test_path, output_path = sys.argv
 
-    k = 21
+    k = 14
     m = 256
 
-    sample_sketches: defaultdict[str, Class] = defaultdict(list)
+    sample_sketches: dict[str, Sketch] = {}
 
-    bar = tqdm(training_sets(training_path), total=csv_length(training_path), desc="Computing training sketches")
+    bar = tqdm(training_sets(training_path), desc="Computing training sketches")
     for cls_label, sequences in bar:
         bar.set_postfix_str(cls_label)
         kmers = kmer_generator(sequences, k=k)
         sketch = compute_minhash(kmers, m=m)
-        sample_sketches[cls_label].append(sketch)
+        sample_sketches[cls_label] = sketch
 
     out_data = defaultdict(list)
     for path, sequences in tqdm(test_sets(test_path), total=csv_length(test_path), desc="Comparing test reads"):
