@@ -71,6 +71,7 @@ def make_seq_gen(path: str) -> Iterator[str]:
     open_fun = gzip.open if path.endswith('.gz') else open
 
     with open_fun(path, 'rt') as handle:
+
         yield from (str(record.seq) for record in SeqIO.parse(handle, "fasta"))
 
 def running_set[T](max_size: int, iter: Iterator[T]) -> Iterator[T]:
@@ -135,7 +136,7 @@ def compute_minhash(kmers: Iterator[str], m: int) -> Sketch:
     #     for _ in range(N_FILTERS)
     # ]
     W = 2_000_000
-    C = optimal_k(W)
+    C = 4
     sketch = array('L', [MAX_U32] * m)
 
     for kmer, cnt in tqdm(batch_counter(kmers, W)):
