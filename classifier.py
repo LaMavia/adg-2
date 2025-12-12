@@ -10,6 +10,7 @@ from tqdm import tqdm
 from array import array
 import itertools
 import os
+from random import Random
 
 MAX_U32 = 2**32 - 1
 CSV_DELIMITER = "\t"
@@ -17,6 +18,50 @@ CSV_DELIMITER = "\t"
 Sketch = array[int]
 Class = list[Sketch]
 
+class Bit(object):
+    TYPE = 'B'
+    TYPE_LEN = 8
+
+    def __init__(self, size: int):
+        self.bits = array(Bit.TYPE, [0]*((size+Bit.TYPE_LEN-1)//Bit.TYPE_LEN))
+
+    def set(self, bit: int):
+        b = self.bits[bit//Bit.TYPE_LEN]
+        self.bits[bit//Bit.TYPE_LEN] = b | 1 << (bit % Bit.TYPE_LEN)
+
+    def __getitem__(self, bit: int):
+        b = self.bits[bit//Bit.TYPE_LEN]
+        return (b >> (bit % Bit.TYPE_LEN)) & 1
+
+
+class BloomFilter(object):
+    def __init__(self, m: int, k: int):
+        self.m = m
+        self.k = k
+        self.bits = Bit(m)
+        self.rand = Random()
+        self.hashes = [
+            lambda v: mmh3.hash(v, seed=i, signed=False)
+            for i in range(k)
+        ]
+
+    def __contains__(self, key: str):
+        for i in self._indexes(key): 
+            if not self.bits[i]:
+                return False    
+        return True 
+
+    def add(self, key: str):
+        for i in self._indexes(key): 
+            self.bits.set(i)
+
+    def _indexes(self, key: str):
+        return (h(key) % self.m for h in self.hashes)
+
+def batch_counter(iter: Iterator[str], w: int) -> Iterator[tuple[str, int]]:
+    for batch in itertools.batched(iter, w):
+        counter = Counter(batch)
+        yield from counter.items()
 
 def csv_length(path: str) -> int:
     with open(path) as f:
@@ -81,22 +126,30 @@ def compute_minhash(kmers: Iterator[str], m: int) -> Sketch:
     Compute a MinHash sketch of size m from an iterator of k-mers.
     Sketch[i] = minimum hash observed under seed i
     """
-    # C = 4
-    sketch = array('L', [MAX_U32] * m)
-    # candidate_set = Counter(kmers)
-    # for kmer, cnt in candidate_set.items():
-    #     if cnt < C:
-    #         continue
-    #     for i in range(m):
-    #         h = mmh3.hash(kmer, seed=i, signed=False)
-    #         if h < sketch[i]:
-    #             sketch[i] = h
 
-    for kmer in kmers:
+    # N_FILTERS = 3
+    # FILTER_LEN = 128
+    # FILTER_HASHES = 10
+    # occurence_filters = [
+    #     BloomFilter(FILTER_LEN, FILTER_HASHES)
+    #     for _ in range(N_FILTERS)
+    # ]
+    C = 4
+    sketch = array('L', [MAX_U32] * m)
+
+    for kmer, cnt in batch_counter(kmers, 100_000):
+        if cnt < C:
+            continue
         for i in range(m):
             h = mmh3.hash(kmer, seed=i, signed=False)
             if h < sketch[i]:
                 sketch[i] = h
+
+    # for kmer in kmers:
+    #     for i in range(m):
+    #         h = mmh3.hash(kmer, seed=i, signed=False)
+    #         if h < sketch[i]:
+    #             sketch[i] = h
 
     return sketch
 
