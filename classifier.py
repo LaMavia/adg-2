@@ -138,7 +138,7 @@ def compute_minhash(kmers: Iterator[str], m: int) -> Sketch:
     C = optimal_k(W)
     sketch = array('L', [MAX_U32] * m)
 
-    for kmer, cnt in batch_counter(kmers, 100_000):
+    for kmer, cnt in tqdm(batch_counter(kmers, W)):
         if cnt < C:
             continue
         for i in range(m):
