@@ -61,6 +61,9 @@ def kmer_generator(sequences: Iterator[str], k: int) -> Iterator[str]:
         n = len(seq)
         for i in range(n - k + 1):
             kmer = seq[i:i+k]
+            if 'N' in kmer:
+                continue
+
             yield canonical_kmer(kmer)
 
 def minhash_similarity(sketch_size: int, a: Sketch, b: Sketch) -> float:
@@ -78,12 +81,18 @@ def compute_minhash(kmers: Iterator[str], m: int) -> Sketch:
     Compute a MinHash sketch of size m from an iterator of k-mers.
     Sketch[i] = minimum hash observed under seed i
     """
-    C = 4
+    # C = 4
     sketch = array('L', [MAX_U32] * m)
-    candidate_set = Counter(kmers)
-    for kmer, cnt in candidate_set.items():
-        if cnt < C:
-            continue
+    # candidate_set = Counter(kmers)
+    # for kmer, cnt in candidate_set.items():
+    #     if cnt < C:
+    #         continue
+    #     for i in range(m):
+    #         h = mmh3.hash(kmer, seed=i, signed=False)
+    #         if h < sketch[i]:
+    #             sketch[i] = h
+
+    for kmer in kmers:
         for i in range(m):
             h = mmh3.hash(kmer, seed=i, signed=False)
             if h < sketch[i]:
