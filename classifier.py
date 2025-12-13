@@ -5,7 +5,6 @@ import pandas as pd
 from Bio import SeqIO 
 import gzip
 import mmh3
-from tqdm import tqdm
 from array import array
 import itertools
 import os
@@ -118,15 +117,14 @@ def main():
 
     sample_sketches: dict[str, Sketch] = {}
 
-    bar = tqdm(training_sets(training_path), desc="Computing training sketches")
+    bar = training_sets(training_path)
     for cls_label, sequences in bar:
-        bar.set_postfix_str(cls_label)
         kmers = kmer_generator(itertools.chain(*sequences), k=k)
         sketch = compute_minhash(kmers, m=m, c=c)
         sample_sketches[cls_label] = sketch
 
     out_data = defaultdict(list)
-    for path, sequences in tqdm(test_sets(test_path), total=csv_length(test_path), desc="Comparing test reads"):
+    for path, sequences in test_sets(test_path):
         kmers = kmer_generator(sequences, k=k)
         sketch = compute_minhash(kmers, m=m, c=c)
 
