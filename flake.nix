@@ -16,6 +16,10 @@
           pandas
           scikit-learn
           tqdm
+          altair
+          vl-convert-python
+        ]) ++ (with pkgs; [
+          parallel
         ]);
       };
     }
