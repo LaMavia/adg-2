@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    #vis.vega-embed {
+      width: 100%;
+      display: flex;
+    }
+
+    #vis.vega-embed details,
+    #vis.vega-embed details summary {
+      position: relative;
+    }
+  </style>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega@6"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega-lite@6.1.0"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega-embed@7"></script>
+</head>
+<body>
+  <div id="vis"></div>
+  <script>
+    (function(vegaEmbed) {
+      var spec = {"config": {"view": {"continuousWidth": 300, "continuousHeight": 300}}, "layer": [{"mark": {"type": "errorbar", "extent": "stdev"}, "encoding": {"x": {"field": "rate", "type": "quantitative"}, "y": {"field": "auc_roc", "scale": {"zero": false}, "type": "quantitative"}}}, {"mark": {"type": "point", "color": "black", "filled": true}, "encoding": {"x": {"field": "rate", "type": "quantitative"}, "y": {"aggregate": "mean", "field": "auc_roc", "type": "quantitative"}}}], "data": {"name": "data-0472bfe3dcd518a645243b2220585cb1"}, "width": 500, "$schema": "https://vega.github.io/schema/vega-lite/v6.1.0.json", "datasets": {"data-0472bfe3dcd518a645243b2220585cb1": [{"rate": 10, "auc_roc": 0.4593}, {"rate": 10, "auc_roc": 0.4728}, {"rate": 10, "auc_roc": 0.4769}, {"rate": 10, "auc_roc": 0.4828}, {"rate": 10, "auc_roc": 0.4815}, {"rate": 10, "auc_roc": 0.4866}, {"rate": 10, "auc_roc": 0.453}, {"rate": 10, "auc_roc": 0.4843}, {"rate": 10, "auc_roc": 0.4588}, {"rate": 10, "auc_roc": 0.4724}, {"rate": 20, "auc_roc": 0.5252}, {"rate": 20, "auc_roc": 0.5221}, {"rate": 20, "auc_roc": 0.5327}, {"rate": 20, "auc_roc": 0.5106}, {"rate": 20, "auc_roc": 0.5303}, {"rate": 20, "auc_roc": 0.5067}, {"rate": 20, "auc_roc": 0.4931}, {"rate": 20, "auc_roc": 0.5176}, {"rate": 20, "auc_roc": 0.4987}, {"rate": 20, "auc_roc": 0.4989}, {"rate": 30, "auc_roc": 0.5713}, {"rate": 30, "auc_roc": 0.565}, {"rate": 30, "auc_roc": 0.5595}, {"rate": 30, "auc_roc": 0.5363}, {"rate": 30, "auc_roc": 0.5592}, {"rate": 30, "auc_roc": 0.5606}, {"rate": 30, "auc_roc": 0.558}, {"rate": 30, "auc_roc": 0.5646}, {"rate": 30, "auc_roc": 0.5281}, {"rate": 30, "auc_roc": 0.5335}, {"rate": 40, "auc_roc": 0.6072}, {"rate": 40, "auc_roc": 0.5767}, {"rate": 40, "auc_roc": 0.5767}, {"rate": 40, "auc_roc": 0.5756}, {"rate": 40, "auc_roc": 0.6013}, {"rate": 40, "auc_roc": 0.6111}, {"rate": 40, "auc_roc": 0.601}, {"rate": 40, "auc_roc": 0.5949}, {"rate": 40, "auc_roc": 0.5766}, {"rate": 40, "auc_roc": 0.5955}, {"rate": 50, "auc_roc": 0.6441}, {"rate": 50, "auc_roc": 0.6124}, {"rate": 50, "auc_roc": 0.6331}, {"rate": 50, "auc_roc": 0.6193}, {"rate": 50, "auc_roc": 0.6374}, {"rate": 50, "auc_roc": 0.6454}, {"rate": 50, "auc_roc": 0.6096}, {"rate": 50, "auc_roc": 0.628}, {"rate": 50, "auc_roc": 0.6116}, {"rate": 50, "auc_roc": 0.6285}, {"rate": 60, "auc_roc": 0.6592}, {"rate": 60, "auc_roc": 0.6427}, {"rate": 60, "auc_roc": 0.6594}, {"rate": 60, "auc_roc": 0.6496}, {"rate": 60, "auc_roc": 0.6617}, {"rate": 60, "auc_roc": 0.6522}, {"rate": 60, "auc_roc": 0.6402}, {"rate": 60, "auc_roc": 0.6679}, {"rate": 60, "auc_roc": 0.6385}, {"rate": 60, "auc_roc": 0.6419}, {"rate": 70, "auc_roc": 0.6736}, {"rate": 70, "auc_roc": 0.6627}, {"rate": 70, "auc_roc": 0.6791}, {"rate": 70, "auc_roc": 0.6846}, {"rate": 70, "auc_roc": 0.6877}, {"rate": 70, "auc_roc": 0.6693}, {"rate": 70, "auc_roc": 0.6698}, {"rate": 70, "auc_roc": 0.69}, {"rate": 70, "auc_roc": 0.6581}, {"rate": 70, "auc_roc": 0.6726}, {"rate": 80, "auc_roc": 0.6889}, {"rate": 80, "auc_roc": 0.6764}, {"rate": 80, "auc_roc": 0.6914}, {"rate": 80, "auc_roc": 0.6971}, {"rate": 80, "auc_roc": 0.7144}, {"rate": 80, "auc_roc": 0.6788}, {"rate": 80, "auc_roc": 0.6987}, {"rate": 80, "auc_roc": 0.6855}, {"rate": 80, "auc_roc": 0.6856}, {"rate": 80, "auc_roc": 0.6835}, {"rate": 90, "auc_roc": 0.7021}, {"rate": 90, "auc_roc": 0.6939}, {"rate": 90, "auc_roc": 0.7005}, {"rate": 90, "auc_roc": 0.7043}, {"rate": 90, "auc_roc": 0.7191}, {"rate": 90, "auc_roc": 0.6949}, {"rate": 90, "auc_roc": 0.7098}, {"rate": 90, "auc_roc": 0.7092}, {"rate": 90, "auc_roc": 0.704}, {"rate": 90, "auc_roc": 0.6934}, {"rate": 100, "auc_roc": 0.7127}, {"rate": 100, "auc_roc": 0.7127}, {"rate": 100, "auc_roc": 0.7127}, {"rate": 100, "auc_roc": 0.7127}, {"rate": 100, "auc_roc": 0.7127}, {"rate": 100, "auc_roc": 0.7127}, {"rate": 100, "auc_roc": 0.7127}, {"rate": 100, "auc_roc": 0.7127}, {"rate": 100, "auc_roc": 0.7127}, {"rate": 100, "auc_roc": 0.7127}]}};
+      var embedOpt = {"mode": "vega-lite"};
+
+      function showError(el, error){
+          el.innerHTML = ('<div style="color:red;">'
+                          + '<p>JavaScript Error: ' + error.message + '</p>'
+                          + "<p>This usually means there's a typo in your chart specification. "
+                          + "See the javascript console for the full traceback.</p>"
+                          + '</div>');
+          throw error;
+      }
+      const el = document.getElementById('vis');
+      vegaEmbed("#vis", spec, embedOpt)
+        .catch(error => showError(el, error));
+    })(vegaEmbed);
+
+  </script>
+</body>
+</html>
