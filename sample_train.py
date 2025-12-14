@@ -39,7 +39,7 @@ def main():
     #     stroke=None
     # )
 
-    chart.save("./sample_train.svg")
+    chart.save("./sample_train.svg") # sample_test.html
 
 if __name__ == "__main__":
     main()
