@@ -6,6 +6,7 @@ import multiprocessing as mp
 import re
 
 def calculate_auc_roc(output_file, ground_truth_file):
+    print(f"{output_file=}")
     output = pd.read_csv(output_file, sep='\t')
     ground_truth = pd.read_csv(ground_truth_file, sep='\t')
 
