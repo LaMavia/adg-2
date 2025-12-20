@@ -59,7 +59,7 @@ def main():
 
     p = mp.Pool(10)
     with p:
-        scores = p.starmap(calculate_auc_roc, [(out, gt) for out, *_ in outputs])
+        scores = [calculate_auc_roc(out, gt) for out, _ in outputs]
         
     test_data = {
         "rate": [],
@@ -81,8 +81,8 @@ def main():
         d['auc_roc'].append(score)
 
 
-    pd.DataFrame(test_data).to_csv("./1-sample-test.tsv", sep="\t")
-    pd.DataFrame(train_data).to_csv("./1-sample-train.tsv", sep="\t")
+    pd.DataFrame(test_data).to_csv("./1-sample-test.tsv", sep="\t", index=False)
+    pd.DataFrame(train_data).to_csv("./1-sample-train.tsv", sep="\t", index=False)
 
 if __name__ == "__main__":
     main()
