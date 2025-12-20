@@ -14,8 +14,6 @@ import random
 MAX_U32 = 2 ** 32 - 1
 CSV_DELIMITER = "\t"
 
-RATE = int(os.environ.get("RATE", 100))
-
 Sketch = array[int]
 Class = list[Sketch]
 
@@ -118,7 +116,7 @@ def compute_minhash(kmers: Iterator[str], m: int, c: int) -> Sketch:
 
 def main():
     # python3 classifier.py training_data.tsv testing_data.tsv output.tsv
-    _, training_path, test_path, output_path = sys.argv
+    _, training_path, test_path = sys.argv
 
     k = 14
     m = 256
@@ -133,9 +131,6 @@ def main():
     b = 4 - 1000 * a
     c = round(a * avg_len + b)
 
-    rate = int(os.environ.get("RATE", "100"))
-    seed = int(os.environ.get("SEED", "42"))
-
     sample_sketches: dict[str, Sketch] = {}
 
     bar = tqdm(training_sets(training_path), desc="Computing training sketches")
@@ -146,17 +141,19 @@ def main():
         sample_sketches[cls_label] = sketch
 
     out_data = defaultdict(list)
-    for path, sequences in tqdm(test_sets(test_path), total=csv_length(test_path), desc="Comparing test reads"):
-        sampled_sequences = sample_iterator(sequences, rate=rate, seed=seed)
-        kmers = kmer_generator(sampled_sequences, k=k)
-        sketch = compute_minhash(kmers, m=m, c=c)
+    for rate, seed in [(r, s) for r in range(10, 101, 10) for s in range(10)]:
+        output_path = f'./test_output-{rate:03d}-{seed:02d}.tsv'
+        for path, sequences in tqdm(test_sets(test_path), total=csv_length(test_path), desc=f"[{output_path}] Comparing test reads", leave=False):
+            sampled_sequences = sample_iterator(sequences, rate=rate, seed=seed)
+            kmers = kmer_generator(sampled_sequences, k=k)
+            sketch = compute_minhash(kmers, m=m, c=c)
 
-        classification = classify_sketch(m, sample_sketches, sketch)
-        out_data['path'].append(path)
-        for cls_label, probability in classification.items():
-            out_data[cls_label].append(f'{probability:.03f}')
+            classification = classify_sketch(m, sample_sketches, sketch)
+            out_data['path'].append(path)
+            for cls_label, probability in classification.items():
+                out_data[cls_label].append(f'{probability:.03f}')
 
-    pd.DataFrame(out_data).to_csv(output_path, sep=CSV_DELIMITER, header=True, index=False)
+        pd.DataFrame(out_data).to_csv(output_path, sep=CSV_DELIMITER, header=True, index=False)
 
 
 if __name__ == "__main__":

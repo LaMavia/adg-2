@@ -2,3 +2,4 @@
 .venv
 _output.tsv
 outout*.tsv
+*output*.tsv
