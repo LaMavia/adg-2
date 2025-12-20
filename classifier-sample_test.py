@@ -138,7 +138,7 @@ def main():
     m = 256
 
     len_list = []
-    for cls_label, sequences in training_sets(training_path):
+    for cls_label, sequences in tqdm(training_sets(training_path), desc="Computing length"):
         l = sum(sum(1 for _ in s) / len(sequences) for s in sequences)
         len_list.append(l)
 
