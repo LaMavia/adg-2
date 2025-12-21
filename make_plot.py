@@ -4,7 +4,7 @@ import sys
 
 def main():
     path = sys.argv[1]
-    data = pd.read_csv(path, delimiter=";")
+    data = pd.read_csv(path, delimiter="\t")
 
     w = 500
 
